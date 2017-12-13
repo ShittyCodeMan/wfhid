@@ -247,7 +247,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 		pExport = (PIMAGE_EXPORT_DIRECTORY)ImageDirectoryEntryToData(BaseAddr, TRUE, IMAGE_DIRECTORY_ENTRY_EXPORT, &Size);
 		pNames = (DWORD*)(BaseAddr + pExport->AddressOfNames);
 		pOrdis = (WORD*)(BaseAddr + pExport->AddressOfNameOrdinals);
-		char buff[256];
 		for (DWORD i = 0, l = pExport->NumberOfFunctions; i < l; i++) {
 			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
 		}
