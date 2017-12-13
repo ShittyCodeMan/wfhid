@@ -105,7 +105,8 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 		//////////////////////////////////////////////////////////////////////////////////////////
 		|| (Stride == 32 && (FALSE
 			//CYST
-			|| (IndexCount == 96 && inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680)
+			//ñ—ÇÕIndexCount == 96ÅBé¿Ç™ïsñæÅB
+			|| (inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680) //Stride: 32
 			//SARYN PRIME
 			|| (IndexCount == 1692 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752)
 			|| (IndexCount == 40602 && inDesc.ByteWidth == 239520 && veDesc.ByteWidth == 272928)
