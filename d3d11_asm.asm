@@ -10,156 +10,156 @@ extern mProcs:DWORD
 ADDR_SIZE equ 4
 ENDIF
 CreateDirect3D11DeviceFromDXGIDevice_wrapper proc
-	jmp mProcs[0*ADDR_SIZE]
+	jmp mProcs[15*ADDR_SIZE]
 CreateDirect3D11DeviceFromDXGIDevice_wrapper endp
 CreateDirect3D11SurfaceFromDXGISurface_wrapper proc
-	jmp mProcs[1*ADDR_SIZE]
+	jmp mProcs[16*ADDR_SIZE]
 CreateDirect3D11SurfaceFromDXGISurface_wrapper endp
 D3D11CoreCreateDevice_wrapper proc
-	jmp mProcs[2*ADDR_SIZE]
+	jmp mProcs[17*ADDR_SIZE]
 D3D11CoreCreateDevice_wrapper endp
 D3D11CoreCreateLayeredDevice_wrapper proc
-	jmp mProcs[3*ADDR_SIZE]
+	jmp mProcs[18*ADDR_SIZE]
 D3D11CoreCreateLayeredDevice_wrapper endp
 D3D11CoreGetLayeredDeviceSize_wrapper proc
-	jmp mProcs[4*ADDR_SIZE]
+	jmp mProcs[19*ADDR_SIZE]
 D3D11CoreGetLayeredDeviceSize_wrapper endp
 D3D11CoreRegisterLayers_wrapper proc
-	jmp mProcs[5*ADDR_SIZE]
+	jmp mProcs[20*ADDR_SIZE]
 D3D11CoreRegisterLayers_wrapper endp
 D3D11CreateDevice_wrapper proc
-	jmp mProcs[6*ADDR_SIZE]
+	jmp mProcs[21*ADDR_SIZE]
 D3D11CreateDevice_wrapper endp
 D3D11CreateDeviceAndSwapChain_wrapper proc
-	jmp mProcs[7*ADDR_SIZE]
+	jmp mProcs[22*ADDR_SIZE]
 D3D11CreateDeviceAndSwapChain_wrapper endp
 D3D11CreateDeviceForD3D12_wrapper proc
-	jmp mProcs[8*ADDR_SIZE]
+	jmp mProcs[0*ADDR_SIZE]
 D3D11CreateDeviceForD3D12_wrapper endp
 D3D11On12CreateDevice_wrapper proc
-	jmp mProcs[9*ADDR_SIZE]
+	jmp mProcs[23*ADDR_SIZE]
 D3D11On12CreateDevice_wrapper endp
 D3DKMTCloseAdapter_wrapper proc
-	jmp mProcs[10*ADDR_SIZE]
+	jmp mProcs[1*ADDR_SIZE]
 D3DKMTCloseAdapter_wrapper endp
 D3DKMTCreateAllocation_wrapper proc
-	jmp mProcs[11*ADDR_SIZE]
+	jmp mProcs[24*ADDR_SIZE]
 D3DKMTCreateAllocation_wrapper endp
 D3DKMTCreateContext_wrapper proc
-	jmp mProcs[12*ADDR_SIZE]
+	jmp mProcs[25*ADDR_SIZE]
 D3DKMTCreateContext_wrapper endp
 D3DKMTCreateDevice_wrapper proc
-	jmp mProcs[13*ADDR_SIZE]
+	jmp mProcs[26*ADDR_SIZE]
 D3DKMTCreateDevice_wrapper endp
 D3DKMTCreateSynchronizationObject_wrapper proc
-	jmp mProcs[14*ADDR_SIZE]
+	jmp mProcs[27*ADDR_SIZE]
 D3DKMTCreateSynchronizationObject_wrapper endp
 D3DKMTDestroyAllocation_wrapper proc
-	jmp mProcs[15*ADDR_SIZE]
+	jmp mProcs[2*ADDR_SIZE]
 D3DKMTDestroyAllocation_wrapper endp
 D3DKMTDestroyContext_wrapper proc
-	jmp mProcs[16*ADDR_SIZE]
+	jmp mProcs[3*ADDR_SIZE]
 D3DKMTDestroyContext_wrapper endp
 D3DKMTDestroyDevice_wrapper proc
-	jmp mProcs[17*ADDR_SIZE]
+	jmp mProcs[4*ADDR_SIZE]
 D3DKMTDestroyDevice_wrapper endp
 D3DKMTDestroySynchronizationObject_wrapper proc
-	jmp mProcs[18*ADDR_SIZE]
+	jmp mProcs[5*ADDR_SIZE]
 D3DKMTDestroySynchronizationObject_wrapper endp
 D3DKMTEscape_wrapper proc
-	jmp mProcs[19*ADDR_SIZE]
+	jmp mProcs[28*ADDR_SIZE]
 D3DKMTEscape_wrapper endp
 D3DKMTGetContextSchedulingPriority_wrapper proc
-	jmp mProcs[20*ADDR_SIZE]
+	jmp mProcs[29*ADDR_SIZE]
 D3DKMTGetContextSchedulingPriority_wrapper endp
 D3DKMTGetDeviceState_wrapper proc
-	jmp mProcs[21*ADDR_SIZE]
+	jmp mProcs[30*ADDR_SIZE]
 D3DKMTGetDeviceState_wrapper endp
 D3DKMTGetDisplayModeList_wrapper proc
-	jmp mProcs[22*ADDR_SIZE]
+	jmp mProcs[31*ADDR_SIZE]
 D3DKMTGetDisplayModeList_wrapper endp
 D3DKMTGetMultisampleMethodList_wrapper proc
-	jmp mProcs[23*ADDR_SIZE]
+	jmp mProcs[32*ADDR_SIZE]
 D3DKMTGetMultisampleMethodList_wrapper endp
 D3DKMTGetRuntimeData_wrapper proc
-	jmp mProcs[24*ADDR_SIZE]
+	jmp mProcs[33*ADDR_SIZE]
 D3DKMTGetRuntimeData_wrapper endp
 D3DKMTGetSharedPrimaryHandle_wrapper proc
-	jmp mProcs[25*ADDR_SIZE]
+	jmp mProcs[34*ADDR_SIZE]
 D3DKMTGetSharedPrimaryHandle_wrapper endp
 D3DKMTLock_wrapper proc
-	jmp mProcs[26*ADDR_SIZE]
+	jmp mProcs[35*ADDR_SIZE]
 D3DKMTLock_wrapper endp
 D3DKMTOpenAdapterFromHdc_wrapper proc
-	jmp mProcs[27*ADDR_SIZE]
+	jmp mProcs[36*ADDR_SIZE]
 D3DKMTOpenAdapterFromHdc_wrapper endp
 D3DKMTOpenResource_wrapper proc
-	jmp mProcs[28*ADDR_SIZE]
+	jmp mProcs[37*ADDR_SIZE]
 D3DKMTOpenResource_wrapper endp
 D3DKMTPresent_wrapper proc
-	jmp mProcs[29*ADDR_SIZE]
+	jmp mProcs[6*ADDR_SIZE]
 D3DKMTPresent_wrapper endp
 D3DKMTQueryAdapterInfo_wrapper proc
-	jmp mProcs[30*ADDR_SIZE]
+	jmp mProcs[7*ADDR_SIZE]
 D3DKMTQueryAdapterInfo_wrapper endp
 D3DKMTQueryAllocationResidency_wrapper proc
-	jmp mProcs[31*ADDR_SIZE]
+	jmp mProcs[38*ADDR_SIZE]
 D3DKMTQueryAllocationResidency_wrapper endp
 D3DKMTQueryResourceInfo_wrapper proc
-	jmp mProcs[32*ADDR_SIZE]
+	jmp mProcs[39*ADDR_SIZE]
 D3DKMTQueryResourceInfo_wrapper endp
 D3DKMTRender_wrapper proc
-	jmp mProcs[33*ADDR_SIZE]
+	jmp mProcs[40*ADDR_SIZE]
 D3DKMTRender_wrapper endp
 D3DKMTSetAllocationPriority_wrapper proc
-	jmp mProcs[34*ADDR_SIZE]
+	jmp mProcs[41*ADDR_SIZE]
 D3DKMTSetAllocationPriority_wrapper endp
 D3DKMTSetContextSchedulingPriority_wrapper proc
-	jmp mProcs[35*ADDR_SIZE]
+	jmp mProcs[42*ADDR_SIZE]
 D3DKMTSetContextSchedulingPriority_wrapper endp
 D3DKMTSetDisplayMode_wrapper proc
-	jmp mProcs[36*ADDR_SIZE]
+	jmp mProcs[43*ADDR_SIZE]
 D3DKMTSetDisplayMode_wrapper endp
 D3DKMTSetDisplayPrivateDriverFormat_wrapper proc
-	jmp mProcs[37*ADDR_SIZE]
+	jmp mProcs[8*ADDR_SIZE]
 D3DKMTSetDisplayPrivateDriverFormat_wrapper endp
 D3DKMTSetGammaRamp_wrapper proc
-	jmp mProcs[38*ADDR_SIZE]
+	jmp mProcs[44*ADDR_SIZE]
 D3DKMTSetGammaRamp_wrapper endp
 D3DKMTSetVidPnSourceOwner_wrapper proc
-	jmp mProcs[39*ADDR_SIZE]
+	jmp mProcs[45*ADDR_SIZE]
 D3DKMTSetVidPnSourceOwner_wrapper endp
 D3DKMTSignalSynchronizationObject_wrapper proc
-	jmp mProcs[40*ADDR_SIZE]
+	jmp mProcs[9*ADDR_SIZE]
 D3DKMTSignalSynchronizationObject_wrapper endp
 D3DKMTUnlock_wrapper proc
-	jmp mProcs[41*ADDR_SIZE]
+	jmp mProcs[10*ADDR_SIZE]
 D3DKMTUnlock_wrapper endp
 D3DKMTWaitForSynchronizationObject_wrapper proc
-	jmp mProcs[42*ADDR_SIZE]
+	jmp mProcs[11*ADDR_SIZE]
 D3DKMTWaitForSynchronizationObject_wrapper endp
 D3DKMTWaitForVerticalBlankEvent_wrapper proc
-	jmp mProcs[43*ADDR_SIZE]
+	jmp mProcs[46*ADDR_SIZE]
 D3DKMTWaitForVerticalBlankEvent_wrapper endp
 D3DPerformance_BeginEvent_wrapper proc
-	jmp mProcs[44*ADDR_SIZE]
+	jmp mProcs[47*ADDR_SIZE]
 D3DPerformance_BeginEvent_wrapper endp
 D3DPerformance_EndEvent_wrapper proc
-	jmp mProcs[45*ADDR_SIZE]
+	jmp mProcs[48*ADDR_SIZE]
 D3DPerformance_EndEvent_wrapper endp
 D3DPerformance_GetStatus_wrapper proc
-	jmp mProcs[46*ADDR_SIZE]
+	jmp mProcs[49*ADDR_SIZE]
 D3DPerformance_GetStatus_wrapper endp
 D3DPerformance_SetMarker_wrapper proc
-	jmp mProcs[47*ADDR_SIZE]
+	jmp mProcs[50*ADDR_SIZE]
 D3DPerformance_SetMarker_wrapper endp
 EnableFeatureLevelUpgrade_wrapper proc
-	jmp mProcs[48*ADDR_SIZE]
+	jmp mProcs[12*ADDR_SIZE]
 EnableFeatureLevelUpgrade_wrapper endp
 OpenAdapter10_wrapper proc
-	jmp mProcs[49*ADDR_SIZE]
+	jmp mProcs[13*ADDR_SIZE]
 OpenAdapter10_wrapper endp
 OpenAdapter10_2_wrapper proc
-	jmp mProcs[50*ADDR_SIZE]
+	jmp mProcs[14*ADDR_SIZE]
 OpenAdapter10_2_wrapper endp
 end

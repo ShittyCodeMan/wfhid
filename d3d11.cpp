@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <imagehlp.h>
 #include <d3d11.h>
 #include "MinHook.h"
 
@@ -226,7 +227,6 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 //エントリポイント
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 	static HINSTANCE mHinstDLL;
-	LPCSTR mImportNames[] = { "CreateDirect3D11DeviceFromDXGIDevice", "CreateDirect3D11SurfaceFromDXGISurface", "D3D11CoreCreateDevice", "D3D11CoreCreateLayeredDevice", "D3D11CoreGetLayeredDeviceSize", "D3D11CoreRegisterLayers", "D3D11CreateDevice", "D3D11CreateDeviceAndSwapChain", "D3D11CreateDeviceForD3D12", "D3D11On12CreateDevice", "D3DKMTCloseAdapter", "D3DKMTCreateAllocation", "D3DKMTCreateContext", "D3DKMTCreateDevice", "D3DKMTCreateSynchronizationObject", "D3DKMTDestroyAllocation", "D3DKMTDestroyContext", "D3DKMTDestroyDevice", "D3DKMTDestroySynchronizationObject", "D3DKMTEscape", "D3DKMTGetContextSchedulingPriority", "D3DKMTGetDeviceState", "D3DKMTGetDisplayModeList", "D3DKMTGetMultisampleMethodList", "D3DKMTGetRuntimeData", "D3DKMTGetSharedPrimaryHandle", "D3DKMTLock", "D3DKMTOpenAdapterFromHdc", "D3DKMTOpenResource", "D3DKMTPresent", "D3DKMTQueryAdapterInfo", "D3DKMTQueryAllocationResidency", "D3DKMTQueryResourceInfo", "D3DKMTRender", "D3DKMTSetAllocationPriority", "D3DKMTSetContextSchedulingPriority", "D3DKMTSetDisplayMode", "D3DKMTSetDisplayPrivateDriverFormat", "D3DKMTSetGammaRamp", "D3DKMTSetVidPnSourceOwner", "D3DKMTSignalSynchronizationObject", "D3DKMTUnlock", "D3DKMTWaitForSynchronizationObject", "D3DKMTWaitForVerticalBlankEvent", "D3DPerformance_BeginEvent", "D3DPerformance_EndEvent", "D3DPerformance_GetStatus", "D3DPerformance_SetMarker", "EnableFeatureLevelUpgrade", "OpenAdapter10", "OpenAdapter10_2" };
 	switch (fdwReason) {
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hinstDLL);
@@ -235,9 +235,23 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 		mHinstDLL = LoadLibrary(lstrcat(sysdir, "\\d3d11.dll"));
 		if (!mHinstDLL)
 			return (FALSE);
-		for (int i = 0; i < 51; i++) {
-			mProcs[i] = GetProcAddress(mHinstDLL, mImportNames[i]);
+
+		//全てのエクスポート関数の序数が連番である場合のみ動作する
+		//エクスポート関数の総数が変わる場合は格納先の配列(mProcs)の長さも変更すること
+		char *BaseAddr;
+		ULONG Size;
+		PIMAGE_EXPORT_DIRECTORY pExport;
+		DWORD *pNames;
+		WORD *pOrdis;
+		BaseAddr = (char*)hinstDLL;
+		pExport = (PIMAGE_EXPORT_DIRECTORY)ImageDirectoryEntryToData(BaseAddr, TRUE, IMAGE_DIRECTORY_ENTRY_EXPORT, &Size);
+		pNames = (DWORD*)(BaseAddr + pExport->AddressOfNames);
+		pOrdis = (WORD*)(BaseAddr + pExport->AddressOfNameOrdinals);
+		char buff[256];
+		for (DWORD i = 0, l = pExport->NumberOfFunctions; i < l; i++) {
+			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
 		}
+
 		//GetCurrentThreadIdがメインスレッドIDを取得できなくなるから、初期化用スレッドに移さないこと
 		if (0 == hKeyHook) {
 			hKeyHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, 0, GetCurrentThreadId());
