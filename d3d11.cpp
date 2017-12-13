@@ -140,6 +140,10 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 			//MIRAGE PRIME
 			|| (IndexCount == 4920 && inDesc.ByteWidth == 29016 && veDesc.ByteWidth == 33408) //Stride: 32
 			|| (IndexCount == 8184 && inDesc.ByteWidth == 48264 && veDesc.ByteWidth == 53888) //Stride: 32
+			//EMBER VERMILLION SKIN
+			|| (IndexCount == 1656 && inDesc.ByteWidth == 9750 && veDesc.ByteWidth == 11968) //Stride: 32
+			|| (IndexCount == 2670 && inDesc.ByteWidth == 15720 && veDesc.ByteWidth == 17120) //Stride: 32
+			|| (IndexCount == 2670 && inDesc.ByteWidth == 15738 && veDesc.ByteWidth == 17120) //Stride: 32
 			//CLOSED CENO HELMET
 			//|| (IndexCount == 5844 && inDesc.ByteWidth == 53730 && veDesc.ByteWidth == 63136)
 			//CLOSED KOPPRA HOOD
