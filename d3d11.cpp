@@ -204,7 +204,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	SOFTWARE: 引数SoftwareをNULLにできない。
 	*/
 	if (FAILED(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, NULL, 0, D3D11_SDK_VERSION, &pDevice, NULL, &pContext))) {
-		return NULL;
+		return 1;
 	}
 
 	vtable = *(void***)pContext;
@@ -236,8 +236,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 		if (!mHinstDLL)
 			return (FALSE);
 
-		//全てのエクスポート関数の序数が連番である場合のみ動作する
-		//エクスポート関数の総数が変わる場合は格納先の配列(mProcs)の長さも変更すること
+		//全てのエクスポート関数の序数が連番である場合のみ動作する。
+		//エクスポート関数の総数が変わる場合は格納先の配列(mProcs)の長さも変更すること。
 		char *BaseAddr;
 		ULONG Size;
 		PIMAGE_EXPORT_DIRECTORY pExport;
@@ -251,7 +251,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
 		}
 
-		//GetCurrentThreadIdがメインスレッドIDを取得できなくなるから、初期化用スレッドに移さないこと
+		//GetCurrentThreadIdがメインスレッドIDを取得できなくなるから、初期化用スレッドに移さないこと。
 		if (0 == hKeyHook) {
 			hKeyHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, 0, GetCurrentThreadId());
 		}
@@ -263,7 +263,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 			UnhookWindowsHookEx(hKeyHook);
 			hKeyHook = 0;
 		}
-		//初期化スレッドが成功する前にアンロードされたらCTDするからNULLチェック
+		//初期化スレッドが成功する前にアンロードされたらCTDするからNULLチェック。
 		if (vtable && MH_OK != MH_DisableHook(vtable[12])) {
 			return FALSE;
 		}
