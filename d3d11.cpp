@@ -189,11 +189,25 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 {
 	//よくわからんけど消すとCTD。
 	//D3D11CreateDeviceの第一引数pAdapterをNULLにすると、まだ存在しないアダプタのリストを自動で読みに行って、アクセス違反で落ちる？
+	//	pAdapterを指定してD3D_DRIVER_TYPE_UNKNOWNしても落ちた。
 	do
 	{
 		Sleep(100);
 	} while (!GetModuleHandle("dxgi.dll"));
 	Sleep(1000);
+
+	/*
+	IDXGIFactory1* pFactory;
+	IDXGIAdapter1* pAdapter;
+	if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&pFactory)))) {
+		return 1;
+	}
+
+	if (FAILED(pFactory->EnumAdapters1(0, &pAdapter))) {
+		pFactory->Release();
+		return 1;
+	}
+	*/
 
 	ID3D11Device *pDevice = NULL;
 	ID3D11DeviceContext *pContext = NULL;
