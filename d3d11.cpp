@@ -190,6 +190,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	//よくわからんけど消すとCTD。
 	//D3D11CreateDeviceの第一引数pAdapterをNULLにすると、まだ存在しないアダプタのリストを自動で読みに行って、アクセス違反で落ちる？
 	//	pAdapterを指定してD3D_DRIVER_TYPE_UNKNOWNしても落ちた。
+	//		pAdapter取得で落ちているのか、D3D11CreateDeviceで落ちているのか特定すべき。
 	do
 	{
 		Sleep(100);
