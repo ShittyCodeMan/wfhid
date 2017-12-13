@@ -137,6 +137,9 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 			//まだ。ランタイムテッセレーションが悪さをする？
 			//NEZHA SKIN
 			|| (IndexCount == 2538 && inDesc.ByteWidth == 14958 && veDesc.ByteWidth == 15968)
+			//MIRAGE PRIME
+			|| (IndexCount == 4920 && inDesc.ByteWidth == 29016 && veDesc.ByteWidth == 33408) //Stride: 32
+			|| (IndexCount == 8184 && inDesc.ByteWidth == 48264 && veDesc.ByteWidth == 53888) //Stride: 32
 			//CLOSED CENO HELMET
 			//|| (IndexCount == 5844 && inDesc.ByteWidth == 53730 && veDesc.ByteWidth == 63136)
 			//CLOSED KOPPRA HOOD
