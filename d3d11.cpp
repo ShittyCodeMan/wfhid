@@ -105,29 +105,33 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 		//////////////////////////////////////////////////////////////////////////////////////////
 		|| (Stride == 32 && (FALSE
 			//CYST
-			//毛はIndexCount == 96。実が不明。
-			|| (inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680) //Stride: 32
+			|| (IndexCount == 96 && inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680) //Stride: 32
+			|| (IndexCount == 1008 && inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680) //Stride: 32
 			//SARYN PRIME
-			|| (IndexCount == 1692 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752)
 			|| (IndexCount == 40602 && inDesc.ByteWidth == 239520 && veDesc.ByteWidth == 272928)
 			|| (IndexCount == 4080 && inDesc.ByteWidth == 24066 && veDesc.ByteWidth == 25216)
-			|| (IndexCount == 1692 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752)
+			|| (IndexCount == 4080 && inDesc.ByteWidth == 24054 && veDesc.ByteWidth == 25216) //Stride: 32
+			|| (IndexCount == 1692 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752) //Stride: 32
+			|| (IndexCount == 5748 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752) //Stride: 32
 			//SARYN ORPHID SKIN
 			|| (IndexCount == 10716 && inDesc.ByteWidth == 63210 && veDesc.ByteWidth == 70240)
 			//TRINITY SKIN
 			|| (IndexCount == 2088 && inDesc.ByteWidth == 12312 && veDesc.ByteWidth == 13760)
 			|| (IndexCount == 2772 && inDesc.ByteWidth == 16338 && veDesc.ByteWidth == 18688)
 			|| (IndexCount == 1770 && inDesc.ByteWidth == 22740 && veDesc.ByteWidth == 25984)
+			|| (IndexCount == 1044 && inDesc.ByteWidth == 22740 && veDesc.ByteWidth == 25984) //Stride: 32
 			//TRINITY PRIME SKIN
 			|| (IndexCount == 1710 && inDesc.ByteWidth == 20172 && veDesc.ByteWidth == 21632)
 			|| (IndexCount == 7410 && inDesc.ByteWidth == 43710 && veDesc.ByteWidth == 53792)
 			|| (IndexCount == 2088 && inDesc.ByteWidth == 12300 && veDesc.ByteWidth == 13504)
+			|| (IndexCount == 20460 && inDesc.ByteWidth == 197052 && veDesc.ByteWidth == 233728) //Stride: 32
 			//TRINITY STREGA SKIN
 			|| (IndexCount == 4044 && inDesc.ByteWidth == 23826 && veDesc.ByteWidth == 26880)
 			|| (IndexCount == 5256 && inDesc.ByteWidth == 30996 && veDesc.ByteWidth == 33984)
 			|| (IndexCount == 13476 && inDesc.ByteWidth == 79482 && veDesc.ByteWidth == 83328)
 			//BANSHEE PRIME SKIN
 			|| (IndexCount == 666 && inDesc.ByteWidth == 4614 && veDesc.ByteWidth == 4608)
+			|| (IndexCount == 576 && inDesc.ByteWidth == 4320 && veDesc.ByteWidth == 4352) //Stride: 32
 			|| (IndexCount == 834 && inDesc.ByteWidth == 5364 && veDesc.ByteWidth == 6560)
 			|| (IndexCount == 1149 && inDesc.ByteWidth == 6942 && veDesc.ByteWidth == 10912)
 			|| (IndexCount == 1464 && inDesc.ByteWidth == 8658 && veDesc.ByteWidth == 12224)
@@ -135,16 +139,26 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 			|| (IndexCount == 4332 && inDesc.ByteWidth == 25536 && veDesc.ByteWidth == 28544)
 			|| (IndexCount == 6174 && inDesc.ByteWidth == 36402 && veDesc.ByteWidth == 40928)
 			//TITANIA SKIN
-			//まだ。ランタイムテッセレーションが悪さをする？
+			|| (IndexCount == 2586 && inDesc.ByteWidth == 15234 && veDesc.ByteWidth == 17376) //Stride: 32
+			|| (IndexCount == 2586 && inDesc.ByteWidth == 15222 && veDesc.ByteWidth == 17376) //Stride: 32
+			|| (IndexCount == 6228 && inDesc.ByteWidth == 36720 && veDesc.ByteWidth == 41472) //Stride: 32
+			|| (IndexCount == 12084 && inDesc.ByteWidth == 71292 && veDesc.ByteWidth == 77760) //Stride: 32
+			|| (IndexCount == 12084 && inDesc.ByteWidth == 71280 && veDesc.ByteWidth == 77760) //Stride: 32
+			|| (IndexCount == 2958 && inDesc.ByteWidth == 349944 && veDesc.ByteWidth == 393184) //Stride: 32
 			//NEZHA SKIN
 			|| (IndexCount == 2538 && inDesc.ByteWidth == 14958 && veDesc.ByteWidth == 15968)
 			//MIRAGE PRIME
 			|| (IndexCount == 4920 && inDesc.ByteWidth == 29016 && veDesc.ByteWidth == 33408) //Stride: 32
 			|| (IndexCount == 8184 && inDesc.ByteWidth == 48264 && veDesc.ByteWidth == 53888) //Stride: 32
+			|| (IndexCount == 1716 && inDesc.ByteWidth == 245262 && veDesc.ByteWidth == 262496) //Stride: 32
 			//EMBER VERMILLION SKIN
 			|| (IndexCount == 1656 && inDesc.ByteWidth == 9750 && veDesc.ByteWidth == 11968) //Stride: 32
 			|| (IndexCount == 2670 && inDesc.ByteWidth == 15720 && veDesc.ByteWidth == 17120) //Stride: 32
 			|| (IndexCount == 2670 && inDesc.ByteWidth == 15738 && veDesc.ByteWidth == 17120) //Stride: 32
+			|| (IndexCount == 636 && inDesc.ByteWidth == 4512 && veDesc.ByteWidth == 4992) //Stride: 32
+			|| (IndexCount == 636 && inDesc.ByteWidth == 4524 && veDesc.ByteWidth == 4992) //Stride: 32
+			|| (IndexCount == 2544 && inDesc.ByteWidth == 14994 && veDesc.ByteWidth == 19968) //Stride: 32
+			|| (IndexCount == 2544 && inDesc.ByteWidth == 14988 && veDesc.ByteWidth == 19968) //Stride: 32
 			//CLOSED CENO HELMET
 			//|| (IndexCount == 5844 && inDesc.ByteWidth == 53730 && veDesc.ByteWidth == 63136)
 			//CLOSED KOPPRA HOOD
@@ -168,6 +182,10 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 			|| (IndexCount == 3582 && inDesc.ByteWidth == 21114 && veDesc.ByteWidth == 20592)
 			//MAG MASK
 			|| (IndexCount == 3348 && inDesc.ByteWidth == 19728 && veDesc.ByteWidth == 17496)
+			//EXCALIBUR MASK
+			|| (IndexCount == 3588 && inDesc.ByteWidth == 21144 && veDesc.ByteWidth == 18720) //Stride: 24
+			//VOLT MASK
+			|| (IndexCount == 2430 && inDesc.ByteWidth == 14316 && veDesc.ByteWidth == 13224) //Stride: 24
 			))
 		//////////////////////////////////////////////////////////////////////////////////////////
 		) {
@@ -198,12 +216,11 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	//よくわからんけど消すとCTD。
 	//D3D11CreateDeviceの第一引数pAdapterをNULLにすると、まだ存在しないアダプタのリストを自動で読みに行って、アクセス違反で落ちる？
 	//	pAdapterを指定してD3D_DRIVER_TYPE_UNKNOWNしても落ちた。
-	//		pAdapter取得で落ちているのか、D3D11CreateDeviceで落ちているのか特定すべき。
 	do
 	{
 		Sleep(100);
 	} while (!GetModuleHandle("dxgi.dll"));
-	Sleep(1000);
+	Sleep(3000);
 
 	/*
 	IDXGIFactory1* pFactory;
