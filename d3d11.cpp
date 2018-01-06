@@ -5,6 +5,21 @@
 
 typedef void(__stdcall *D3D11DRAWINDEXED) (ID3D11DeviceContext *pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation);
 D3D11DRAWINDEXED orig_D3D11DrawIndexed = NULL;
+typedef struct FILTER_ENTRY{
+	UINT IndexCount, inDesc, veDesc;
+} _FILTER_ENTRY;
+typedef struct FILTER_HASH {
+	FILTER_ENTRY entry[8]; //Vector使ってみたい
+	int length;
+} _FILTER_HASH;
+typedef struct FILTER_STRIDE {
+	FILTER_HASH hash[256];
+} _FILTER_STRIDE;
+typedef struct FILTER_TABLE {
+	FILTER_STRIDE Stride24;
+	FILTER_STRIDE Stride32;
+} _FILTER_TABLE;
+
 
 extern "C" {
 	void *mProcs[51] = { 0 };
@@ -65,6 +80,8 @@ extern "C" {
 HHOOK hKeyHook = 0;
 void **vtable = NULL;
 BOOL flag = FALSE;
+FILTER_TABLE filter;
+
 
 //D3D11描画フック
 void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation)
@@ -100,96 +117,13 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 		inBuffer = NULL;
 	}
 
-	//テンノフードの裏はデフォルトの顔だからコメントアウト
-	if (FALSE
-		//////////////////////////////////////////////////////////////////////////////////////////
-		|| (Stride == 32 && (FALSE
-			//CYST
-			|| (IndexCount == 96 && inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680) //Stride: 32
-			|| (IndexCount == 1008 && inDesc.ByteWidth == 6714 && veDesc.ByteWidth == 7680) //Stride: 32
-			//SARYN PRIME
-			|| (IndexCount == 40602 && inDesc.ByteWidth == 239520 && veDesc.ByteWidth == 272928)
-			|| (IndexCount == 4080 && inDesc.ByteWidth == 24066 && veDesc.ByteWidth == 25216)
-			|| (IndexCount == 4080 && inDesc.ByteWidth == 24054 && veDesc.ByteWidth == 25216) //Stride: 32
-			|| (IndexCount == 1692 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752) //Stride: 32
-			|| (IndexCount == 5748 && inDesc.ByteWidth == 43890 && veDesc.ByteWidth == 50752) //Stride: 32
-			//SARYN ORPHID SKIN
-			|| (IndexCount == 10716 && inDesc.ByteWidth == 63210 && veDesc.ByteWidth == 70240)
-			//TRINITY SKIN
-			|| (IndexCount == 2088 && inDesc.ByteWidth == 12312 && veDesc.ByteWidth == 13760)
-			|| (IndexCount == 2772 && inDesc.ByteWidth == 16338 && veDesc.ByteWidth == 18688)
-			|| (IndexCount == 1770 && inDesc.ByteWidth == 22740 && veDesc.ByteWidth == 25984)
-			|| (IndexCount == 1044 && inDesc.ByteWidth == 22740 && veDesc.ByteWidth == 25984) //Stride: 32
-			//TRINITY PRIME SKIN
-			|| (IndexCount == 1710 && inDesc.ByteWidth == 20172 && veDesc.ByteWidth == 21632)
-			|| (IndexCount == 7410 && inDesc.ByteWidth == 43710 && veDesc.ByteWidth == 53792)
-			|| (IndexCount == 2088 && inDesc.ByteWidth == 12300 && veDesc.ByteWidth == 13504)
-			|| (IndexCount == 20460 && inDesc.ByteWidth == 197052 && veDesc.ByteWidth == 233728) //Stride: 32
-			//TRINITY STREGA SKIN
-			|| (IndexCount == 4044 && inDesc.ByteWidth == 23826 && veDesc.ByteWidth == 26880)
-			|| (IndexCount == 5256 && inDesc.ByteWidth == 30996 && veDesc.ByteWidth == 33984)
-			|| (IndexCount == 13476 && inDesc.ByteWidth == 79482 && veDesc.ByteWidth == 83328)
-			//BANSHEE PRIME SKIN
-			|| (IndexCount == 666 && inDesc.ByteWidth == 4614 && veDesc.ByteWidth == 4608)
-			|| (IndexCount == 576 && inDesc.ByteWidth == 4320 && veDesc.ByteWidth == 4352) //Stride: 32
-			|| (IndexCount == 834 && inDesc.ByteWidth == 5364 && veDesc.ByteWidth == 6560)
-			|| (IndexCount == 1149 && inDesc.ByteWidth == 6942 && veDesc.ByteWidth == 10912)
-			|| (IndexCount == 1464 && inDesc.ByteWidth == 8658 && veDesc.ByteWidth == 12224)
-			//BANSHEE SOPRANA SKIN
-			|| (IndexCount == 4332 && inDesc.ByteWidth == 25536 && veDesc.ByteWidth == 28544)
-			|| (IndexCount == 6174 && inDesc.ByteWidth == 36402 && veDesc.ByteWidth == 40928)
-			//TITANIA SKIN
-			|| (IndexCount == 2586 && inDesc.ByteWidth == 15234 && veDesc.ByteWidth == 17376) //Stride: 32
-			|| (IndexCount == 2586 && inDesc.ByteWidth == 15222 && veDesc.ByteWidth == 17376) //Stride: 32
-			|| (IndexCount == 6228 && inDesc.ByteWidth == 36720 && veDesc.ByteWidth == 41472) //Stride: 32
-			|| (IndexCount == 12084 && inDesc.ByteWidth == 71292 && veDesc.ByteWidth == 77760) //Stride: 32
-			|| (IndexCount == 12084 && inDesc.ByteWidth == 71280 && veDesc.ByteWidth == 77760) //Stride: 32
-			|| (IndexCount == 2958 && inDesc.ByteWidth == 349944 && veDesc.ByteWidth == 393184) //Stride: 32
-			//NEZHA SKIN
-			|| (IndexCount == 2538 && inDesc.ByteWidth == 14958 && veDesc.ByteWidth == 15968)
-			//MIRAGE PRIME
-			|| (IndexCount == 4920 && inDesc.ByteWidth == 29016 && veDesc.ByteWidth == 33408) //Stride: 32
-			|| (IndexCount == 8184 && inDesc.ByteWidth == 48264 && veDesc.ByteWidth == 53888) //Stride: 32
-			|| (IndexCount == 1716 && inDesc.ByteWidth == 245262 && veDesc.ByteWidth == 262496) //Stride: 32
-			//EMBER VERMILLION SKIN
-			|| (IndexCount == 1656 && inDesc.ByteWidth == 9750 && veDesc.ByteWidth == 11968) //Stride: 32
-			|| (IndexCount == 2670 && inDesc.ByteWidth == 15720 && veDesc.ByteWidth == 17120) //Stride: 32
-			|| (IndexCount == 2670 && inDesc.ByteWidth == 15738 && veDesc.ByteWidth == 17120) //Stride: 32
-			|| (IndexCount == 636 && inDesc.ByteWidth == 4512 && veDesc.ByteWidth == 4992) //Stride: 32
-			|| (IndexCount == 636 && inDesc.ByteWidth == 4524 && veDesc.ByteWidth == 4992) //Stride: 32
-			|| (IndexCount == 2544 && inDesc.ByteWidth == 14994 && veDesc.ByteWidth == 19968) //Stride: 32
-			|| (IndexCount == 2544 && inDesc.ByteWidth == 14988 && veDesc.ByteWidth == 19968) //Stride: 32
-			//CLOSED CENO HELMET
-			//|| (IndexCount == 5844 && inDesc.ByteWidth == 53730 && veDesc.ByteWidth == 63136)
-			//CLOSED KOPPRA HOOD
-			//|| (IndexCount == 25362 && inDesc.ByteWidth == 149610 && veDesc.ByteWidth == 160256)
-			//CLOSED MANDUKA HOOD
-			//|| (IndexCount == 11310 && inDesc.ByteWidth == 66708 && veDesc.ByteWidth == 71744)
-			//CLOSED SAITA PRIME HOOD
-			//|| (IndexCount == 20106 && inDesc.ByteWidth == 118596 && veDesc.ByteWidth == 138304)
-			//CLOSED VAHD MASK
-			//|| (IndexCount == 8400 && inDesc.ByteWidth == 49554 && veDesc.ByteWidth == 54080)
-			//CLOSED VARIDA HOOD
-			//|| (IndexCount == 4356 && inDesc.ByteWidth == 165504 && veDesc.ByteWidth == 189792)
-			//CLOSED ZARIMAN HOOD
-			//|| (IndexCount == 23946 && inDesc.ByteWidth == 141264 && veDesc.ByteWidth == 153216)
-			//CLOSED ZAUBA MASK
-			//|| (IndexCount == 3792 && inDesc.ByteWidth == 22356 && veDesc.ByteWidth == 27104)
-			))
-		//////////////////////////////////////////////////////////////////////////////////////////
-		|| (Stride == 24 && (FALSE
-			//TRINITY MASK
-			|| (IndexCount == 3582 && inDesc.ByteWidth == 21114 && veDesc.ByteWidth == 20592)
-			//MAG MASK
-			|| (IndexCount == 3348 && inDesc.ByteWidth == 19728 && veDesc.ByteWidth == 17496)
-			//EXCALIBUR MASK
-			|| (IndexCount == 3588 && inDesc.ByteWidth == 21144 && veDesc.ByteWidth == 18720) //Stride: 24
-			//VOLT MASK
-			|| (IndexCount == 2430 && inDesc.ByteWidth == 14316 && veDesc.ByteWidth == 13224) //Stride: 24
-			))
-		//////////////////////////////////////////////////////////////////////////////////////////
-		) {
-		return;
+	FILTER_HASH *phash = &(Stride == 32 ? filter.Stride32 : filter.Stride24).hash[IndexCount & 0xFF];
+	FILTER_ENTRY *pentry;
+	for (int i = phash->length - 1; i >= 0; i--) {
+		pentry = &phash->entry[i];
+		if (pentry->IndexCount == IndexCount && pentry->inDesc == inDesc.ByteWidth && pentry->veDesc == veDesc.ByteWidth) {
+			return;
+		}
 	}
 
 	return orig_D3D11DrawIndexed(pContext, IndexCount, StartIndexLocation, BaseVertexLocation);
@@ -210,9 +144,114 @@ LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(hKeyHook, code, wParam, lParam);
 }
 
+void InsertFilter(FILTER_STRIDE *fstride, UINT IndexCount, UINT inDesc, UINT veDesc) {
+	FILTER_HASH *phash;
+	FILTER_ENTRY *pentry;
+	phash = &fstride->hash[IndexCount & 0xFF];
+	pentry = &phash->entry[phash->length++];
+	pentry->IndexCount = IndexCount;
+	pentry->inDesc = inDesc;
+	pentry->veDesc = veDesc;
+}
+
+FILTER_TABLE GenerateFilterTable() {
+	FILTER_TABLE r;
+	SecureZeroMemory(&r, sizeof(r));
+
+#define INSERT_FILTER(IndexCount, inDesc, veDesc) InsertFilter(&r.Stride32, IndexCount, inDesc, veDesc)
+	//CYST
+	INSERT_FILTER(96, 6714, 7680);
+	INSERT_FILTER(1008, 6714, 7680);
+	//SARYN PRIME
+	INSERT_FILTER(40602, 239520, 272928);
+	INSERT_FILTER(4080, 24066, 25216);
+	INSERT_FILTER(4080, 24054, 25216);
+	INSERT_FILTER(1692, 43890, 50752);
+	INSERT_FILTER(5748, 43890, 50752);
+	//SARYN ORPHID SKIN
+	INSERT_FILTER(10716, 63210, 70240);
+	//TRINITY SKIN
+	INSERT_FILTER(2088, 12312, 13760);
+	INSERT_FILTER(2772, 16338, 18688);
+	INSERT_FILTER(1770, 22740, 25984);
+	INSERT_FILTER(1044, 22740, 25984);
+	//TRINITY PRIME SKIN
+	INSERT_FILTER(1710, 20172, 21632);
+	INSERT_FILTER(7410, 43710, 53792);
+	INSERT_FILTER(2088, 12300, 13504);
+	INSERT_FILTER(20460, 197052, 233728);
+	//TRINITY STREGA SKIN
+	INSERT_FILTER(4044, 23826, 26880);
+	INSERT_FILTER(5256, 30996, 33984);
+	INSERT_FILTER(13476, 79482, 83328);
+	//BANSHEE PRIME SKIN
+	INSERT_FILTER(666, 4614, 4608);
+	INSERT_FILTER(576, 4320, 4352);
+	INSERT_FILTER(834, 5364, 6560);
+	INSERT_FILTER(1149, 6942, 10912);
+	INSERT_FILTER(1464, 8658, 12224);
+	//BANSHEE SOPRANA SKIN
+	INSERT_FILTER(4332, 25536, 28544);
+	INSERT_FILTER(6174, 36402, 40928);
+	//TITANIA SKIN
+	INSERT_FILTER(2586, 15234, 17376);
+	INSERT_FILTER(2586, 15222, 17376);
+	INSERT_FILTER(6228, 36720, 41472);
+	INSERT_FILTER(12084, 71292, 77760);
+	INSERT_FILTER(12084, 71280, 77760);
+	INSERT_FILTER(2958, 349944, 393184);
+	//NEZHA SKIN
+	INSERT_FILTER(2538, 14958, 15968);
+	//MIRAGE PRIME
+	INSERT_FILTER(4920, 29016, 33408);
+	INSERT_FILTER(8184, 48264, 53888);
+	INSERT_FILTER(1716, 245262, 262496);
+	//EMBER VERMILLION SKIN
+	INSERT_FILTER(1656, 9750, 11968);
+	INSERT_FILTER(2670, 15720, 17120);
+	INSERT_FILTER(2670, 15738, 17120);
+	INSERT_FILTER(636, 4512, 4992);
+	INSERT_FILTER(636, 4524, 4992);
+	INSERT_FILTER(2544, 14994, 19968);
+	INSERT_FILTER(2544, 14988, 19968);
+	//CLOSED CENO HELMET
+	INSERT_FILTER(5844, 53730, 63136);
+	//CLOSED KOPPRA HOOD
+	INSERT_FILTER(25362, 149610, 160256);
+	//CLOSED MANDUKA HOOD
+	INSERT_FILTER(11310, 66708, 71744);
+	//CLOSED SAITA PRIME HOOD
+	INSERT_FILTER(20106, 118596, 138304);
+	//CLOSED VAHD MASK
+	INSERT_FILTER(8400, 49554, 54080);
+	//CLOSED VARIDA HOOD
+	INSERT_FILTER(4356, 165504, 189792);
+	//CLOSED ZARIMAN HOOD
+	INSERT_FILTER(23946, 141264, 153216);
+	//CLOSED ZAUBA MASK
+	INSERT_FILTER(3792, 22356, 27104);
+#undef INSERT_FILTER
+
+#define INSERT_FILTER(IndexCount, inDesc, veDesc) InsertFilter(&r.Stride24, IndexCount, inDesc, veDesc)
+	//TRINITY MASK
+	INSERT_FILTER(3582, 21114, 20592);
+	//MAG MASK
+	INSERT_FILTER(3348, 19728, 17496);
+	//EXCALIBUR MASK
+	INSERT_FILTER(3588, 21144, 18720);
+	//VOLT MASK
+	INSERT_FILTER(2430, 14316, 13224);
+#undef INSERT_FILTER
+
+	return r;
+}
+
 //初期化用スレッド
 DWORD WINAPI ThreadProc(LPVOID lpParameter)
 {
+	
+	//D3D11フック開始
+
 	//よくわからんけど消すとCTD。
 	//D3D11CreateDeviceの第一引数pAdapterをNULLにすると、まだ存在しないアダプタのリストを自動で読みに行って、アクセス違反で落ちる？
 	//	pAdapterを指定してD3D_DRIVER_TYPE_UNKNOWNしても落ちた。
@@ -290,6 +329,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 		for (DWORD i = 0, l = pExport->NumberOfFunctions; i < l; i++) {
 			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
 		}
+
+		filter = GenerateFilterTable();
 
 		//GetCurrentThreadIdがメインスレッドIDを取得できなくなるから、初期化用スレッドに移さないこと。
 		if (0 == hKeyHook) {
