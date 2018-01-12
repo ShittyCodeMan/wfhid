@@ -9,7 +9,7 @@ typedef struct FILTER_ENTRY{
 	UINT IndexCount, inDesc, veDesc;
 } _FILTER_ENTRY;
 typedef struct FILTER_HASH {
-	FILTER_ENTRY entry[8]; //VectorŽg‚Á‚Ä‚Ý‚½‚¢
+	FILTER_ENTRY entry[2]; //VectorÌ—p‚Í•Û—¯
 	int length;
 } _FILTER_HASH;
 typedef struct FILTER_STRIDE {
@@ -87,11 +87,13 @@ FILTER_TABLE filter;
 void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation)
 {
 	ID3D11Buffer *veBuffer;
+	UINT veWidth;
 	UINT Stride;
 	UINT veBufferOffset;
 	D3D11_BUFFER_DESC veDesc;
 
 	ID3D11Buffer *inBuffer;
+	UINT inWidth;
 	DXGI_FORMAT inFormat;
 	UINT inOffset;
 	D3D11_BUFFER_DESC inDesc;
@@ -103,6 +105,7 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 	pContext->IAGetVertexBuffers(0, 1, &veBuffer, &Stride, &veBufferOffset);
 	if (veBuffer) {
 		veBuffer->GetDesc(&veDesc);
+		veWidth = veDesc.ByteWidth;
 	}
 	if (NULL != veBuffer) {
 		veBuffer->Release();
@@ -110,18 +113,20 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 	}
 
 	pContext->IAGetIndexBuffer(&inBuffer, &inFormat, &inOffset);
-	if (inBuffer)
+	if (inBuffer) {
 		inBuffer->GetDesc(&inDesc);
+		inWidth = inDesc.ByteWidth;
+	}
 	if (NULL != inBuffer) {
 		inBuffer->Release();
 		inBuffer = NULL;
 	}
 
-	FILTER_HASH *phash = &(Stride == 32 ? filter.Stride32 : filter.Stride24).hash[IndexCount & 0xFF];
+	FILTER_HASH *phash = &(Stride == 32 ? filter.Stride32 : filter.Stride24).hash[inWidth & 0xFF];
 	FILTER_ENTRY *pentry;
 	for (int i = phash->length - 1; i >= 0; i--) {
 		pentry = &phash->entry[i];
-		if (pentry->IndexCount == IndexCount && pentry->inDesc == inDesc.ByteWidth && pentry->veDesc == veDesc.ByteWidth) {
+		if (pentry->IndexCount == IndexCount && pentry->inDesc == inWidth && pentry->veDesc == veWidth) {
 			return;
 		}
 	}
@@ -147,7 +152,7 @@ LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam)
 void InsertFilter(FILTER_STRIDE *fstride, UINT IndexCount, UINT inDesc, UINT veDesc) {
 	FILTER_HASH *phash;
 	FILTER_ENTRY *pentry;
-	phash = &fstride->hash[IndexCount & 0xFF];
+	phash = &fstride->hash[inDesc & 0xFF];
 	pentry = &phash->entry[phash->length++];
 	pentry->IndexCount = IndexCount;
 	pentry->inDesc = inDesc;
@@ -259,7 +264,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	{
 		Sleep(100);
 	} while (!GetModuleHandle("dxgi.dll"));
-	Sleep(3000);
+	Sleep(7000);
 
 	/*
 	IDXGIFactory1* pFactory;
@@ -309,6 +314,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 	switch (fdwReason) {
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hinstDLL);
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 		char sysdir[MAX_PATH];
 		GetSystemDirectory(sysdir, sizeof(sysdir));
 		mHinstDLL = LoadLibrary(lstrcat(sysdir, "\\d3d11.dll"));
