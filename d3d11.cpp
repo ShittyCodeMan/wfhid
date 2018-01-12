@@ -149,21 +149,21 @@ LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(hKeyHook, code, wParam, lParam);
 }
 
-void InsertFilter(FILTER_STRIDE *fstride, UINT IndexCount, UINT inDesc, UINT veDesc) {
+void InsertFilter(FILTER_STRIDE *fstride, UINT IndexCount, UINT inWidth, UINT veWidth) {
 	FILTER_HASH *phash;
 	FILTER_ENTRY *pentry;
-	phash = &fstride->hash[inDesc & 0xFF];
+	phash = &fstride->hash[inWidth & 0xFF];
 	pentry = &phash->entry[phash->length++];
 	pentry->IndexCount = IndexCount;
-	pentry->inDesc = inDesc;
-	pentry->veDesc = veDesc;
+	pentry->inDesc = inWidth;
+	pentry->veDesc = veWidth;
 }
 
 FILTER_TABLE GenerateFilterTable() {
 	FILTER_TABLE r;
 	SecureZeroMemory(&r, sizeof(r));
 
-#define INSERT_FILTER(IndexCount, inDesc, veDesc) InsertFilter(&r.Stride32, IndexCount, inDesc, veDesc)
+#define INSERT_FILTER(IndexCount, inWidth, veWidth) InsertFilter(&r.Stride32, IndexCount, inWidth, veWidth)
 	//CYST
 	INSERT_FILTER(96, 6714, 7680);
 	INSERT_FILTER(1008, 6714, 7680);
@@ -237,7 +237,7 @@ FILTER_TABLE GenerateFilterTable() {
 	INSERT_FILTER(3792, 22356, 27104);
 #undef INSERT_FILTER
 
-#define INSERT_FILTER(IndexCount, inDesc, veDesc) InsertFilter(&r.Stride24, IndexCount, inDesc, veDesc)
+#define INSERT_FILTER(IndexCount, inWidth, veWidth) InsertFilter(&r.Stride24, IndexCount, inWidth, veWidth)
 	//TRINITY MASK
 	INSERT_FILTER(3582, 21114, 20592);
 	//MAG MASK
