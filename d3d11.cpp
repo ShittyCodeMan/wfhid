@@ -254,7 +254,8 @@ FILTER_TABLE GenerateFilterTable() {
 //初期化用スレッド
 DWORD WINAPI ThreadProc(LPVOID lpParameter)
 {
-	
+	filter = GenerateFilterTable();
+
 	//D3D11フック開始
 
 	//よくわからんけど消すとCTD。
@@ -292,13 +293,17 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	}
 
 	vtable = *(void***)pContext;
-	if (MH_OK != MH_Initialize()) {
+	MH_STATUS st;
+	if (MH_OK != (st = MH_Initialize()) && MH_ERROR_ALREADY_INITIALIZED != st) {
+		MessageBox(0, "MH_Initialize", NULL, MB_OK);
 		return 1;
 	}
-	if (MH_OK != MH_CreateHook(vtable[12], hook_D3D11DrawIndexed, (void**)&orig_D3D11DrawIndexed)) {
+	if (MH_OK != (st = MH_CreateHook(vtable[12], hook_D3D11DrawIndexed, (void**)&orig_D3D11DrawIndexed)) && MH_ERROR_ALREADY_CREATED != st) {
+		MessageBox(0, "MH_CreateHook", NULL, MB_OK);
 		return 1;
 	}
-	if (MH_OK != MH_EnableHook(vtable[12])) {
+	if (MH_OK != (st = MH_EnableHook(vtable[12])) && MH_ERROR_ENABLED != st) {
+		MessageBox(0, "MH_EnableHook", NULL, MB_OK);
 		return 1;
 	}
 
@@ -336,13 +341,17 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
 		}
 
-		filter = GenerateFilterTable();
-
-		//GetCurrentThreadIdがメインスレッドIDを取得できなくなるから、初期化用スレッドに移さないこと。
+		//lpParameterに(DWORD)GetCurrentThreadId()してみたけど、うまくいかなかった。
+		//Toolhelpで最初に列挙されるスレッドエントリはメインスレッドだと、仕様として定義されてるとかされてないとかどっかで読んだ覚えがある。
+		//でもそもそもWindowsにはメインスレッドという概念すらなかったような・・・。
+		//スレッド開始時間でメインスレッドを特定できる。
+		//単純にグローバル変数にGetCurrentThreadId()を代入しておけばいい気がする。
+		//別にそこまでDLLローダの実行時間を気にしなくていい気がする。動くんだからこれでいい。
 		if (0 == hKeyHook) {
 			hKeyHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, 0, GetCurrentThreadId());
 		}
-		CreateThread(0, 0, ThreadProc, 0, 0, 0);
+
+		CreateThread(0, 0, ThreadProc, NULL, 0, 0);
 		break;
 
 	case DLL_PROCESS_DETACH:
