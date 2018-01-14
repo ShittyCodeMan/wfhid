@@ -294,15 +294,18 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 
 	vtable = *(void***)pContext;
 	MH_STATUS st;
-	if (MH_OK != (st = MH_Initialize()) && MH_ERROR_ALREADY_INITIALIZED != st) {
+	st = MH_Initialize();
+	if (MH_OK != st && MH_ERROR_ALREADY_INITIALIZED != st) {
 		MessageBox(0, "MH_Initialize", NULL, MB_OK);
 		return 1;
 	}
-	if (MH_OK != (st = MH_CreateHook(vtable[12], hook_D3D11DrawIndexed, (void**)&orig_D3D11DrawIndexed)) && MH_ERROR_ALREADY_CREATED != st) {
+	st = MH_CreateHook(vtable[12], hook_D3D11DrawIndexed, (void**)&orig_D3D11DrawIndexed);
+	if (MH_OK != st && MH_ERROR_ALREADY_CREATED != st) {
 		MessageBox(0, "MH_CreateHook", NULL, MB_OK);
 		return 1;
 	}
-	if (MH_OK != (st = MH_EnableHook(vtable[12])) && MH_ERROR_ENABLED != st) {
+	st = MH_EnableHook(vtable[12]);
+	if (MH_OK != st && MH_ERROR_ENABLED != st) {
 		MessageBox(0, "MH_EnableHook", NULL, MB_OK);
 		return 1;
 	}
