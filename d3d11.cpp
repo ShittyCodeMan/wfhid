@@ -341,7 +341,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
 		}
 
-		//lpParameterに(DWORD)GetCurrentThreadId()してみたけど、うまくいかなかった。
+		//lpParameterに(void*)GetCurrentThreadId()してみたけど、うまくいかなかった。
 		//Toolhelpで最初に列挙されるスレッドエントリはメインスレッドだと、仕様として定義されてるとかされてないとかどっかで読んだ覚えがある。
 		//でもそもそもWindowsにはメインスレッドという概念すらなかったような・・・。
 		//スレッド開始時間でメインスレッドを特定できる。
