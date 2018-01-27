@@ -126,7 +126,7 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 	FILTER_ENTRY *pentry;
 	for (int i = phash->length - 1; i >= 0; i--) {
 		pentry = &phash->entry[i];
-		if (pentry->IndexCount) {
+		if (!pentry->IndexCount) {
 			break;
 		}
 		if (pentry->IndexCount == IndexCount && pentry->inDesc == inWidth && pentry->veDesc == veWidth) {
