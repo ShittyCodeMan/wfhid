@@ -6,14 +6,14 @@
 typedef void(__stdcall *D3D11DRAWINDEXED) (ID3D11DeviceContext *pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation);
 D3D11DRAWINDEXED orig_D3D11DrawIndexed = NULL;
 typedef struct FILTER_ENTRY{
-	UINT IndexCount, inDesc, veDesc;
+	UINT IndexCount, InDesc, VeDesc;
 } _FILTER_ENTRY;
 typedef struct FILTER_HASH {
-	FILTER_ENTRY entry[2]; //Vector採用は保留
-	int length;
+	FILTER_ENTRY Entry[2]; //Vector採用は保留
+	int Length;
 } _FILTER_HASH;
 typedef struct FILTER_STRIDE {
-	FILTER_HASH hash[256];
+	FILTER_HASH Hash[256];
 } _FILTER_STRIDE;
 typedef struct FILTER_TABLE {
 	FILTER_STRIDE Stride24;
@@ -22,7 +22,7 @@ typedef struct FILTER_TABLE {
 
 
 extern "C" {
-	void *mProcs[51] = { 0 };
+	void *g_Procs[51] = { 0 };
 
 	void CreateDirect3D11DeviceFromDXGIDevice_wrapper();
 	void CreateDirect3D11SurfaceFromDXGISurface_wrapper();
@@ -77,59 +77,59 @@ extern "C" {
 	void OpenAdapter10_2_wrapper();
 }
 
-HHOOK hKeyHook = 0;
-void **vtable = NULL;
-BOOL flag = FALSE;
-FILTER_TABLE filter;
+HHOOK g_hKeyHook = 0;
+void **g_VTable = NULL;
+BOOL g_Flag = FALSE;
+FILTER_TABLE g_Filter;
 
 
 //D3D11描画フック
 void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation)
 {
-	ID3D11Buffer *veBuffer;
-	UINT veWidth;
+	ID3D11Buffer *VeBuffer;
+	UINT VeWidth;
 	UINT Stride;
-	UINT veBufferOffset;
-	D3D11_BUFFER_DESC veDesc;
+	UINT VeBufferOffset;
+	D3D11_BUFFER_DESC VeDesc;
 
-	ID3D11Buffer *inBuffer;
-	UINT inWidth;
-	DXGI_FORMAT inFormat;
-	UINT inOffset;
-	D3D11_BUFFER_DESC inDesc;
+	ID3D11Buffer *InBuffer;
+	UINT InWidth;
+	DXGI_FORMAT InFormat;
+	UINT InOffset;
+	D3D11_BUFFER_DESC InDesc;
 
-	if (!flag) {
+	if (!g_Flag) {
 		return orig_D3D11DrawIndexed(pContext, IndexCount, StartIndexLocation, BaseVertexLocation);
 	}
 
-	pContext->IAGetVertexBuffers(0, 1, &veBuffer, &Stride, &veBufferOffset);
-	if (veBuffer) {
-		veBuffer->GetDesc(&veDesc);
-		veWidth = veDesc.ByteWidth;
+	pContext->IAGetVertexBuffers(0, 1, &VeBuffer, &Stride, &VeBufferOffset);
+	if (VeBuffer) {
+		VeBuffer->GetDesc(&VeDesc);
+		VeWidth = VeDesc.ByteWidth;
 	}
-	if (NULL != veBuffer) {
-		veBuffer->Release();
-		veBuffer = NULL;
-	}
-
-	pContext->IAGetIndexBuffer(&inBuffer, &inFormat, &inOffset);
-	if (inBuffer) {
-		inBuffer->GetDesc(&inDesc);
-		inWidth = inDesc.ByteWidth;
-	}
-	if (NULL != inBuffer) {
-		inBuffer->Release();
-		inBuffer = NULL;
+	if (NULL != VeBuffer) {
+		VeBuffer->Release();
+		VeBuffer = NULL;
 	}
 
-	FILTER_HASH *phash = &(Stride == 32 ? filter.Stride32 : filter.Stride24).hash[inWidth & 0xFF];
-	FILTER_ENTRY *pentry;
-	for (int i = phash->length - 1; i >= 0; i--) {
-		pentry = &phash->entry[i];
-		if (!pentry->IndexCount) {
+	pContext->IAGetIndexBuffer(&InBuffer, &InFormat, &InOffset);
+	if (InBuffer) {
+		InBuffer->GetDesc(&InDesc);
+		InWidth = InDesc.ByteWidth;
+	}
+	if (NULL != InBuffer) {
+		InBuffer->Release();
+		InBuffer = NULL;
+	}
+
+	FILTER_HASH *pHash = &(Stride == 32 ? g_Filter.Stride32 : g_Filter.Stride24).Hash[InWidth & 0xFF];
+	FILTER_ENTRY *pEntry;
+	for (int i = pHash->Length - 1; i >= 0; i--) {
+		pEntry = &pHash->Entry[i];
+		if (!pEntry->IndexCount) {
 			break;
 		}
-		if (pentry->IndexCount == IndexCount && pentry->inDesc == inWidth && pentry->veDesc == veWidth) {
+		if (pEntry->IndexCount == IndexCount && pEntry->InDesc == InWidth && pEntry->VeDesc == VeWidth) {
 			return;
 		}
 	}
@@ -138,35 +138,35 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 }
 
 //キーボードフック
-LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK KeyboardProc(int Code, WPARAM WParam, LPARAM LParam)
 {
-	if (0 < code) {
-		return CallNextHookEx(hKeyHook, code, wParam, lParam);
+	if (0 < Code) {
+		return CallNextHookEx(g_hKeyHook, Code, WParam, LParam);
 	}
-	if (HC_ACTION == code) {
-		if (VK_PAUSE == wParam && lParam >> 31) {
-			flag = !flag;
-			MessageBeep(flag ? MB_ICONEXCLAMATION : MB_ICONQUESTION);
+	if (HC_ACTION == Code) {
+		if (VK_PAUSE == WParam && LParam >> 31) {
+			g_Flag = !g_Flag;
+			MessageBeep(g_Flag ? MB_ICONEXCLAMATION : MB_ICONQUESTION);
 		}
 	}
-	return CallNextHookEx(hKeyHook, code, wParam, lParam);
+	return CallNextHookEx(g_hKeyHook, Code, WParam, LParam);
 }
 
-void InsertFilter(FILTER_STRIDE *fstride, UINT IndexCount, UINT inWidth, UINT veWidth) {
-	FILTER_HASH *phash;
-	FILTER_ENTRY *pentry;
-	phash = &fstride->hash[inWidth & 0xFF];
-	pentry = &phash->entry[phash->length++];
-	pentry->IndexCount = IndexCount;
-	pentry->inDesc = inWidth;
-	pentry->veDesc = veWidth;
+void InsertFilter(FILTER_STRIDE *FilterStride, UINT IndexCount, UINT InWidth, UINT VeWidth) {
+	FILTER_HASH *pHash;
+	FILTER_ENTRY *pEntry;
+	pHash = &FilterStride->Hash[InWidth & 0xFF];
+	pEntry = &pHash->Entry[pHash->Length++];
+	pEntry->IndexCount = IndexCount;
+	pEntry->InDesc = InWidth;
+	pEntry->VeDesc = VeWidth;
 }
 
 FILTER_TABLE GenerateFilterTable() {
 	FILTER_TABLE r;
 	SecureZeroMemory(&r, sizeof(r));
 
-#define INSERT_FILTER(IndexCount, inWidth, veWidth) InsertFilter(&r.Stride32, IndexCount, inWidth, veWidth)
+#define INSERT_FILTER(IndexCount, InWidth, VeWidth) InsertFilter(&r.Stride32, IndexCount, InWidth, VeWidth)
 	//CYST
 	INSERT_FILTER(96, 6714, 7680);
 	INSERT_FILTER(1008, 6714, 7680);
@@ -242,7 +242,7 @@ FILTER_TABLE GenerateFilterTable() {
 	INSERT_FILTER(3792, 22356, 27104);
 #undef INSERT_FILTER
 
-#define INSERT_FILTER(IndexCount, inWidth, veWidth) InsertFilter(&r.Stride24, IndexCount, inWidth, veWidth)
+#define INSERT_FILTER(IndexCount, InWidth, VeWidth) InsertFilter(&r.Stride24, IndexCount, InWidth, VeWidth)
 	//TRINITY MASK
 	INSERT_FILTER(3582, 21114, 20592);
 	//MAG MASK
@@ -259,7 +259,7 @@ FILTER_TABLE GenerateFilterTable() {
 //初期化用スレッド
 DWORD WINAPI ThreadProc(LPVOID lpParameter)
 {
-	filter = GenerateFilterTable();
+	g_Filter = GenerateFilterTable();
 
 	//D3D11フック開始
 
@@ -297,19 +297,19 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 		return 1;
 	}
 
-	vtable = *(void***)pContext;
+	g_VTable = *(void***)pContext;
 	MH_STATUS st;
 	st = MH_Initialize();
 	if (MH_OK != st && MH_ERROR_ALREADY_INITIALIZED != st) {
 		MessageBox(0, "MH_Initialize", NULL, MB_OK);
 		return 1;
 	}
-	st = MH_CreateHook(vtable[12], hook_D3D11DrawIndexed, (void**)&orig_D3D11DrawIndexed);
+	st = MH_CreateHook(g_VTable[12], hook_D3D11DrawIndexed, (void**)&orig_D3D11DrawIndexed);
 	if (MH_OK != st && MH_ERROR_ALREADY_CREATED != st) {
 		MessageBox(0, "MH_CreateHook", NULL, MB_OK);
 		return 1;
 	}
-	st = MH_EnableHook(vtable[12]);
+	st = MH_EnableHook(g_VTable[12]);
 	if (MH_OK != st && MH_ERROR_ENABLED != st) {
 		MessageBox(0, "MH_EnableHook", NULL, MB_OK);
 		return 1;
@@ -323,19 +323,19 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 
 //エントリポイント
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
-	static HINSTANCE mHinstDLL;
+	static HINSTANCE s_hInstDLL;
 	switch (fdwReason) {
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hinstDLL);
 		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 		char sysdir[MAX_PATH];
 		GetSystemDirectory(sysdir, sizeof(sysdir));
-		mHinstDLL = LoadLibrary(lstrcat(sysdir, "\\d3d11.dll"));
-		if (!mHinstDLL)
+		s_hInstDLL = LoadLibrary(lstrcat(sysdir, "\\d3d11.dll"));
+		if (!s_hInstDLL)
 			return (FALSE);
 
 		//全てのエクスポート関数の序数が連番である場合のみ動作する。
-		//エクスポート関数の総数が変わる場合は格納先の配列(mProcs)の長さも変更すること。
+		//エクスポート関数の総数が変わる場合は格納先の配列(g_Procs)の長さも変更すること。
 		char *BaseAddr;
 		ULONG Size;
 		PIMAGE_EXPORT_DIRECTORY pExport;
@@ -346,7 +346,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 		pNames = (DWORD*)(BaseAddr + pExport->AddressOfNames);
 		pOrdis = (WORD*)(BaseAddr + pExport->AddressOfNameOrdinals);
 		for (DWORD i = 0, l = pExport->NumberOfFunctions; i < l; i++) {
-			mProcs[pOrdis[i]] = GetProcAddress(mHinstDLL, BaseAddr + pNames[i]);
+			g_Procs[pOrdis[i]] = GetProcAddress(s_hInstDLL, BaseAddr + pNames[i]);
 		}
 
 		//lpParameterに(void*)GetCurrentThreadId()してみたけど、うまくいかなかった。
@@ -355,23 +355,23 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 		//スレッド開始時間でメインスレッドを特定できる。
 		//単純にグローバル変数にGetCurrentThreadId()を代入しておけばいい気がする。
 		//別にそこまでDLLローダの実行時間を気にしなくていい気がする。動くんだからこれでいい。
-		if (0 == hKeyHook) {
-			hKeyHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, 0, GetCurrentThreadId());
+		if (0 == g_hKeyHook) {
+			g_hKeyHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, 0, GetCurrentThreadId());
 		}
 
 		CreateThread(0, 0, ThreadProc, NULL, 0, 0);
 		break;
 
 	case DLL_PROCESS_DETACH:
-		if (0 != hKeyHook) {
-			UnhookWindowsHookEx(hKeyHook);
-			hKeyHook = 0;
+		if (0 != g_hKeyHook) {
+			UnhookWindowsHookEx(g_hKeyHook);
+			g_hKeyHook = 0;
 		}
 		//初期化スレッドが成功する前にアンロードされたらCTDするからNULLチェック。
-		if (vtable && MH_OK != MH_DisableHook(vtable[12])) {
+		if (g_VTable && MH_OK != MH_DisableHook(g_VTable[12])) {
 			return FALSE;
 		}
-		FreeLibrary(mHinstDLL);
+		FreeLibrary(s_hInstDLL);
 		break;
 
 	default:
