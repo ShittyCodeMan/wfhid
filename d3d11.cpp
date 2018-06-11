@@ -3,6 +3,8 @@
 #include <d3d11.h>
 #include "MinHook.h"
 
+#define HASH_SIZE 128
+
 typedef void(__stdcall *D3D11DRAWINDEXED) (ID3D11DeviceContext *pContext, UINT IndexCount, UINT StartIndexLocation, INT BaseVertexLocation);
 D3D11DRAWINDEXED orig_D3D11DrawIndexed = NULL;
 typedef struct FILTER_ENTRY{
@@ -12,12 +14,8 @@ typedef struct FILTER_HASH {
 	FILTER_ENTRY Entry[4]; //VectorÌ—p‚Í•Û—¯
 	int Length;
 } _FILTER_HASH;
-typedef struct FILTER_STRIDE {
-	FILTER_HASH Hash[256];
-} _FILTER_STRIDE;
 typedef struct FILTER_TABLE {
-	FILTER_STRIDE Stride24;
-	FILTER_STRIDE Stride32;
+	FILTER_HASH Hash[HASH_SIZE];
 } _FILTER_TABLE;
 
 
@@ -122,7 +120,7 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 		InBuffer = NULL;
 	}
 
-	FILTER_HASH *pHash = &(Stride == 32 ? g_Filter.Stride32 : g_Filter.Stride24).Hash[InWidth >> 1 & 0xFF];
+	FILTER_HASH *pHash = &g_Filter.Hash[InWidth >> 1 & HASH_SIZE-1];
 	FILTER_ENTRY *pEntry;
 	for (int i = pHash->Length - 1; i >= 0; i--) {
 		pEntry = &pHash->Entry[i];
@@ -152,10 +150,10 @@ LRESULT CALLBACK KeyboardProc(int Code, WPARAM WParam, LPARAM LParam)
 	return CallNextHookEx(g_hKeyHook, Code, WParam, LParam);
 }
 
-void InsertFilter(FILTER_STRIDE *FilterStride, UINT IndexCount, UINT InWidth, UINT VeWidth) {
+void InsertFilter(FILTER_TABLE *Filters, UINT IndexCount, UINT InWidth, UINT VeWidth) {
 	FILTER_HASH *pHash;
 	FILTER_ENTRY *pEntry;
-	pHash = &FilterStride->Hash[InWidth >> 1 & 0xFF];
+	pHash = &Filters->Hash[InWidth >> 1 & HASH_SIZE-1];
 	pEntry = &pHash->Entry[pHash->Length++];
 	pEntry->IndexCount = IndexCount;
 	pEntry->InDesc = InWidth;
@@ -166,7 +164,7 @@ FILTER_TABLE GenerateFilterTable() {
 	FILTER_TABLE r;
 	SecureZeroMemory(&r, sizeof(r));
 
-#define INSERT_FILTER(IndexCount, InWidth, VeWidth) InsertFilter(&r.Stride32, IndexCount, InWidth, VeWidth)
+#define INSERT_FILTER(IndexCount, InWidth, VeWidth) InsertFilter(&r, IndexCount, InWidth, VeWidth)
 	//CYST
 	INSERT_FILTER(96, 6714, 7680);
 	INSERT_FILTER(1008, 6714, 7680);
@@ -241,11 +239,20 @@ FILTER_TABLE GenerateFilterTable() {
 	INSERT_FILTER(2478, 14604, 18624);
 	//ZEPHYR PRIME SKIN
 	INSERT_FILTER(984, 12870, 7904);
+	INSERT_FILTER(984, 12882, 7904);
+	INSERT_FILTER(1044, 6384, 7200);
 	INSERT_FILTER(1044, 6390, 7200);
 	INSERT_FILTER(1200, 12870, 16864);
+	INSERT_FILTER(1200, 12882, 16864);
 	INSERT_FILTER(2148, 361614, 416480);
 	INSERT_FILTER(2700, 15924, 21568);
 	INSERT_FILTER(3540, 20886, 23872);
+	//GARA SKIN
+	INSERT_FILTER(1938, 250716, 269984);
+	INSERT_FILTER(4164, 24546, 31104);
+	INSERT_FILTER(4164, 24558, 31104);
+	INSERT_FILTER(8628, 50886, 94272);
+	INSERT_FILTER(1590, 9360, 10080);
 
 	//CLOSED CENO HELMET
 	INSERT_FILTER(5844, 53730, 63136);
@@ -263,9 +270,7 @@ FILTER_TABLE GenerateFilterTable() {
 	INSERT_FILTER(23946, 141264, 153216);
 	//CLOSED ZAUBA MASK
 	INSERT_FILTER(3792, 22356, 27104);
-#undef INSERT_FILTER
 
-#define INSERT_FILTER(IndexCount, InWidth, VeWidth) InsertFilter(&r.Stride24, IndexCount, InWidth, VeWidth)
 	//TRINITY MASK
 	INSERT_FILTER(3582, 21114, 20592);
 	//MAG MASK
