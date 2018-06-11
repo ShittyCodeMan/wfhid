@@ -9,7 +9,7 @@ typedef struct FILTER_ENTRY{
 	UINT IndexCount, InDesc, VeDesc;
 } _FILTER_ENTRY;
 typedef struct FILTER_HASH {
-	FILTER_ENTRY Entry[2]; //VectorÌ—p‚Í•Û—¯
+	FILTER_ENTRY Entry[4]; //VectorÌ—p‚Í•Û—¯
 	int Length;
 } _FILTER_HASH;
 typedef struct FILTER_STRIDE {
@@ -122,7 +122,7 @@ void __stdcall hook_D3D11DrawIndexed(ID3D11DeviceContext *pContext, UINT IndexCo
 		InBuffer = NULL;
 	}
 
-	FILTER_HASH *pHash = &(Stride == 32 ? g_Filter.Stride32 : g_Filter.Stride24).Hash[InWidth & 0xFF];
+	FILTER_HASH *pHash = &(Stride == 32 ? g_Filter.Stride32 : g_Filter.Stride24).Hash[InWidth >> 1 & 0xFF];
 	FILTER_ENTRY *pEntry;
 	for (int i = pHash->Length - 1; i >= 0; i--) {
 		pEntry = &pHash->Entry[i];
@@ -155,7 +155,7 @@ LRESULT CALLBACK KeyboardProc(int Code, WPARAM WParam, LPARAM LParam)
 void InsertFilter(FILTER_STRIDE *FilterStride, UINT IndexCount, UINT InWidth, UINT VeWidth) {
 	FILTER_HASH *pHash;
 	FILTER_ENTRY *pEntry;
-	pHash = &FilterStride->Hash[InWidth & 0xFF];
+	pHash = &FilterStride->Hash[InWidth >> 1 & 0xFF];
 	pEntry = &pHash->Entry[pHash->Length++];
 	pEntry->IndexCount = IndexCount;
 	pEntry->InDesc = InWidth;
@@ -170,6 +170,12 @@ FILTER_TABLE GenerateFilterTable() {
 	//CYST
 	INSERT_FILTER(96, 6714, 7680);
 	INSERT_FILTER(1008, 6714, 7680);
+	//EQUINOX SKIN NIGHT FORM
+	INSERT_FILTER(1938, 11418, 11936);
+	INSERT_FILTER(1938, 11412, 11936);
+	INSERT_FILTER(4458, 83562, 82720);
+	INSERT_FILTER(2478, 83562, 82720);
+	INSERT_FILTER(2772, 83562, 82720);
 	//SARYN PRIME
 	INSERT_FILTER(40602, 239520, 272928);
 	INSERT_FILTER(4080, 24066, 25216);
@@ -228,6 +234,18 @@ FILTER_TABLE GenerateFilterTable() {
 	INSERT_FILTER(6318, 37254, 42016);
 	//KHORA SKIN
 	INSERT_FILTER(3300, 19458, 22400);
+	//NOVA ASURI SKIN
+	INSERT_FILTER(3270, 19266, 20480);
+	INSERT_FILTER(4092, 24132, 27680);
+	//VALKYR GEMINI SKIN
+	INSERT_FILTER(2478, 14604, 18624);
+	//ZEPHYR PRIME SKIN
+	INSERT_FILTER(984, 12870, 7904);
+	INSERT_FILTER(1044, 6390, 7200);
+	INSERT_FILTER(1200, 12870, 16864);
+	INSERT_FILTER(2148, 361614, 416480);
+	INSERT_FILTER(2700, 15924, 21568);
+	INSERT_FILTER(3540, 20886, 23872);
 
 	//CLOSED CENO HELMET
 	INSERT_FILTER(5844, 53730, 63136);
